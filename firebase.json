@@ -1,0 +1,29 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "mini-foodpanda",
+          "appId": "1:622801590367:android:d11200374c7988d999e3ea",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "mini-foodpanda",
+          "configurations": {
+            "android": "1:622801590367:android:d11200374c7988d999e3ea",
+            "ios": "1:622801590367:ios:cd8ca6d3aa29b92f99e3ea",
+            "macos": "1:622801590367:ios:cd8ca6d3aa29b92f99e3ea",
+            "web": "1:622801590367:web:20356e20b0910b5799e3ea",
+            "windows": "1:622801590367:web:1e6541acbff8008199e3ea"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  }
+}

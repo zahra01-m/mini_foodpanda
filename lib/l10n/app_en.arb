@@ -1,0 +1,34 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "Mini FoodPanda",
+
+  "roleTagline": "Good food, delivered fast. Continue as —",
+  "roleCustomer": "Customer",
+  "roleCustomerSubtitle": "Order food from nearby restaurants",
+  "roleRider": "Rider",
+  "roleRiderSubtitle": "Accept and deliver orders",
+  "roleAdmin": "Admin",
+  "roleAdminSubtitle": "Manage vendors, riders, and orders",
+
+  "loginTitle": "Log in",
+  "welcomeBack": "Welcome back",
+  "loginSubtitle": "Log in to continue",
+  "emailLabel": "Email",
+  "passwordLabel": "Password",
+  "logIn": "Log in",
+  "createAnAccount": "Create an account",
+
+  "signupTitle": "Create account",
+  "fullNameLabel": "Full name",
+  "phoneLabel": "Phone",
+  "signUp": "Sign up",
+
+  "profileTitle": "Profile",
+  "notLoggedIn": "Not logged in",
+  "notifications": "Notifications",
+  "appearance": "Appearance",
+  "language": "Language",
+  "logOut": "Log out",
+  "languageAuto": "Auto"
+}

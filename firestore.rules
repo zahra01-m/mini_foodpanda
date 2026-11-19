@@ -1,0 +1,157 @@
+rules_version = '2';
+
+// Deploy with: firebase deploy --only firestore:rules
+// (or paste into Firebase console -> Firestore Database -> Rules)
+//
+// Covers every collection in the spec: users, restaurants, menuItems,
+// orders, riderLocations, reviews, plus the notifications inbox.
+//
+// NOTE: roles are chosen at signup on the client, so on Firebase's free
+// plan (no Cloud Functions) these rules enforce the *shape* of access but
+// a determined user could still sign up as "admin". Assigning roles from a
+// server is the fix once you move to a paid plan.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+    function me() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    function isAdmin() {
+      return signedIn() && me().role == 'admin';
+    }
+    function isApprovedRider() {
+      return signedIn() && me().role == 'rider' && me().get('isApproved', true) == true;
+    }
+    // Demo/sample documents (seeded from the admin dashboard's "Load sample
+    // data" button) use ids that start with 'sample-'. Only admins may
+    // write those on behalf of other people.
+    function isSampleId(id) {
+      return id.matches('sample-.*');
+    }
+    function changed(keys) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys);
+    }
+
+    match /users/{uid} {
+      allow read: if signedIn();
+      allow create: if signedIn() && (
+        request.auth.uid == uid
+        || (isAdmin() && isSampleId(uid))
+      );
+      // Admin may refresh sample profiles when re-running the seed.
+      allow update: if isAdmin() && isSampleId(uid);
+      // Owners can edit their profile but not their role or approval.
+      allow update: if signedIn() && (
+        (request.auth.uid == uid
+          && request.resource.data.role == resource.data.role
+          && request.resource.data.get('isApproved', true) == resource.data.get('isApproved', true))
+        || (isAdmin() && changed(['isApproved']))
+      );
+      allow delete: if false;
+    }
+
+    match /restaurants/{id} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    match /menuItems/{id} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    match /orders/{orderId} {
+      allow read: if signedIn() && (
+        resource.data.customerId == request.auth.uid
+        || resource.data.riderId == request.auth.uid
+        || isAdmin()
+        || (isApprovedRider() && resource.data.status == 'preparing')
+      );
+
+      allow create: if signedIn() && (
+        (request.resource.data.customerId == request.auth.uid
+          && request.resource.data.status == 'pending')
+        // Sample orders (any status) written by an admin.
+        || (isAdmin() && isSampleId(orderId))
+      );
+
+      allow update: if signedIn() && (
+        isAdmin()
+        // Customer reporting a problem with their own order.
+        || (resource.data.customerId == request.auth.uid
+            && changed(['disputeReason', 'disputeStatus'])
+            && request.resource.data.disputeStatus == 'open')
+        // Customer cancelling their own order before the restaurant starts on it.
+        || (resource.data.customerId == request.auth.uid
+            && resource.data.status == 'pending'
+            && changed(['status', 'updatedAt'])
+            && request.resource.data.status == 'cancelled')
+        // Approved rider claiming an unassigned order that is being prepared.
+        || (isApprovedRider()
+            && resource.data.riderId == null
+            && resource.data.status == 'preparing'
+            && request.resource.data.riderId == request.auth.uid
+            && changed(['riderId', 'updatedAt']))
+        // Assigned rider moving it to out-for-delivery / delivered.
+        || (isApprovedRider()
+            && resource.data.riderId == request.auth.uid
+            && changed(['status', 'updatedAt'])
+            && request.resource.data.status in ['outForDelivery', 'delivered'])
+      );
+
+      // Admin re-running the sample seed removes retired sample orders.
+      allow delete: if isAdmin() && isSampleId(orderId);
+    }
+
+    // High-frequency rider GPS writes live here, away from the order doc.
+    match /riderLocations/{riderId} {
+      allow read: if signedIn();
+      allow write: if signedIn() && (
+        (request.auth.uid == riderId && me().role == 'rider')
+        || (isAdmin() && isSampleId(riderId))
+      );
+    }
+
+    // One review per order: the document id is the order id.
+    // Deterministic doc id ({customerId}_{restaurantId}) is what makes
+    // "one favorite per customer per restaurant" enforceable here.
+    match /favorites/{favId} {
+      allow read: if signedIn() && resource.data.customerId == request.auth.uid;
+      allow create: if signedIn()
+        && request.resource.data.customerId == request.auth.uid
+        && favId == request.resource.data.customerId + '_' + request.resource.data.restaurantId;
+      allow delete: if signedIn() && resource.data.customerId == request.auth.uid;
+      allow update: if false;
+    }
+
+    match /reviews/{reviewId} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && (request.resource.data.customerId == request.auth.uid
+            || (isAdmin() && isSampleId(reviewId)))
+        && reviewId == request.resource.data.orderId
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5;
+      // Admin re-running the sample seed overwrites its own sample reviews.
+      allow update: if isAdmin() && isSampleId(reviewId)
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5;
+      allow delete: if isAdmin() && isSampleId(reviewId);
+    }
+
+    match /notifications/{id} {
+      allow read: if signedIn() && resource.data.userId == request.auth.uid;
+      // Admin/rider clients write status updates for the customer.
+      allow create: if signedIn();
+      allow update: if signedIn()
+        && resource.data.userId == request.auth.uid
+        && changed(['read']);
+      // Admin re-running the sample seed refreshes its sample notifications.
+      allow update: if isAdmin() && isSampleId(id);
+      allow delete: if isAdmin() && isSampleId(id);
+    }
+  }
+}

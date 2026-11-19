@@ -1,0 +1,34 @@
+{
+  "@@locale": "ur",
+
+  "appTitle": "Mini FoodPanda",
+
+  "roleTagline": "لذیذ کھانا، تیزی سے آپ کی دہلیز پر۔ جاری رکھیں بطور —",
+  "roleCustomer": "کسٹمر",
+  "roleCustomerSubtitle": "قریبی ریستورانوں سے کھانا آرڈر کریں",
+  "roleRider": "رائیڈر",
+  "roleRiderSubtitle": "آرڈرز قبول کریں اور ڈیلیور کریں",
+  "roleAdmin": "ایڈمن",
+  "roleAdminSubtitle": "وینڈرز، رائیڈرز اور آرڈرز کا انتظام کریں",
+
+  "loginTitle": "لاگ ان",
+  "welcomeBack": "خوش آمدید",
+  "loginSubtitle": "جاری رکھنے کے لیے لاگ ان کریں",
+  "emailLabel": "ای میل",
+  "passwordLabel": "پاس ورڈ",
+  "logIn": "لاگ ان کریں",
+  "createAnAccount": "اکاؤنٹ بنائیں",
+
+  "signupTitle": "اکاؤنٹ بنائیں",
+  "fullNameLabel": "پورا نام",
+  "phoneLabel": "فون نمبر",
+  "signUp": "سائن اپ",
+
+  "profileTitle": "پروفائل",
+  "notLoggedIn": "لاگ ان نہیں ہیں",
+  "notifications": "اطلاعات",
+  "appearance": "ظہور",
+  "language": "زبان",
+  "logOut": "لاگ آؤٹ",
+  "languageAuto": "خودکار"
+}

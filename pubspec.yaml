@@ -1,0 +1,58 @@
+name: mini_foodpanda
+description: A mini food delivery app — customer, rider, and admin roles in one Flutter codebase.
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  # Riverpod 2.x — the app is written against StateNotifier / StateProvider /
+  # valueOrNull, which Riverpod 3.x moved or removed. Don't bump to 3.x
+  # without a separate migration.
+  flutter_riverpod: ^2.6.1
+  # google_fonts 9.x pulls in material_ui/cupertino_ui, whose TextTheme is a
+  # different type from the one in your Flutter SDK. Stay on 8.x.
+  google_fonts: ^8.2.1
+  intl: ^0.20.3
+  uuid: ^4.4.0
+  fl_chart: ^1.2.0
+  firebase_core: ^4.0.0
+  firebase_auth: ^6.0.0
+  cloud_firestore: ^6.0.0
+  # Real Google Maps SDK — needs a billing-enabled Google Cloud project
+  # (Maps SDK for Android/iOS only; well inside the $200/mo free credit
+  # for a project this size). Road-route polyline still comes from the
+  # free OSRM API — see MAPS_SETUP.md for exact setup steps.
+  google_maps_flutter: ^2.10.0
+  geolocator: ^14.1.1
+  url_launcher: ^6.3.1
+  http: ^1.2.2
+  # Admin picks restaurant / dish photos from the gallery.
+  image_picker: ^1.1.2
+  # Cart + saved delivery addresses persist across app restarts.
+  shared_preferences: ^2.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  # Testing: in-memory Firestore/Auth fakes so service tests exercise the
+  # real query/update logic without hitting a real project, plus a
+  # mockable http.Client for route_service. If `flutter pub get` can't
+  # resolve these against the firebase_* versions above, run
+  # `flutter pub upgrade fake_cloud_firestore firebase_auth_mocks --major-versions`
+  # to pick up whatever newer major is current.
+  fake_cloud_firestore: ^4.3.0
+  firebase_auth_mocks: ^0.15.2
+  mocktail: ^1.0.4
+
+flutter:
+  uses-material-design: true
+  generate: true
+  assets:
+    - assets/images/

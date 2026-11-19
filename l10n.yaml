@@ -1,0 +1,7 @@
+# Flutter's built-in localization codegen — runs automatically as part of
+# `flutter pub get` / `flutter run` / `flutter build` because pubspec.yaml
+# has `generate: true`. No manual step needed.
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+output-dir: lib/l10n
